@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EcoToken - Sustainable Impact Platform</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #4caf50;
+            border-radius: 5px;
+        }
+        .eco-card {
+            background-color: #c8e6c9;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Register User</h2>
+        <input type="text" id="userName" placeholder="Your Name">
+        <button onclick="registerUser()">Register</button>
+    </div>
+
+    <div class="container">
+        <h2>Log Environmental Action</h2>
+        <input type="text" id="actionDescription" placeholder="Describe your eco-friendly action">
+        <input type="number" id="carbonReduction" placeholder="Carbon Reduction (in kg)">
+        <button onclick="logEnvironmentalAction()">Log Action</button>
+    </div>
+
+    <div class="container">
+        <h2>Transfer Carbon Credits</h2>
+        <input type="text" id="transferTo" placeholder="Recipient Principal">
+        <input type="number" id="transferAmount" placeholder="Carbon Credits to Transfer">
+        <button onclick="transferCarbonCredits()">Transfer</button>
+    </div>
+
+    <div class="container">
+        <h2>User Profile</h2>
+        <input type="text" id="profileId" placeholder="User Principal ID">
+        <button onclick="getUserProfile()">Get Profile</button>
+        <div id="profileDetails"></div>
+    </div>
+
+    <script type="module">
+        import { backend } from 'declarations/backend';
+
+        // Fungsi registrasi pengguna
+        window.registerUser = async () => {
+            const name = document.getElementById('userName').value;
+
+            try {
+                const result = await backend.registerUser(name);
+                if (result.ok) {
+                    alert(`Registered with ID: ${result.ok}`);
+                } else {
+                    alert(`Error: ${result.err}`);
+                }
+            } catch (error) {
+                console.error('Registration failed:', error);
+            }
+        };
+
+        // Fungsi mencatat aksi lingkungan
+        window.logEnvironmentalAction = async () => {
+            const description = document.getElementById('actionDescription').value;
+            const carbonReduction = parseInt(document.getElementById('carbonReduction').value);
+
+            try {
+                const result = await backend.logEnvironmentalAction(description, carbonReduction);
+                if (result.ok) {
+                    alert('Environmental action logged successfully');
+                } else {
+                    alert(`Error: ${result.err}`);
+                }
+            } catch (error) {
+                console.error('Logging action failed:', error);
+            }
+        };
+
+        // Fungsi transfer kredit karbon
+        window.transferCarbonCredits = async () => {
+            const to = document.getElementById('transferTo').value;
+            const amount = parseInt(document.getElementById('transferAmount').value);
+
+            try {
+                const result = await backend.transferCarbonCredits(to, amount);
+                if (result.ok) {
+                    alert('Carbon credits transferred successfully');
+                } else {
+                    alert(`Error: ${result.err}`);
+                }
+            } catch (error) {
+                console.error('Transfer failed:', error);
+            }
+        };
+
+        // Fungsi mendapatkan profil pengguna
+        window.getUserProfile = async () => {
+            const profileId = document.getElementById('profileId').value;
+            const profileDetails = document.getElementById('profileDetails');
+
+            try {
+                const profile = await backend.getUserProfile(profileId);
+                if (profile) {
+                    profileDetails.innerHTML = `
+                        <div class="eco-card">
+                            <h3>Name: ${profile.name}</h3>
+                            <p>Carbon Credits: ${profile.carbonCredits}</p>
+                            <p>Sustainability Score: ${profile.sustainabilityScore}</p>
+                        </div>
+                    `;
+                } else {
+                    profileDetails.innerHTML = 'Profile not found';
+                }
+            } catch (error) {
+                console.error('Profile retrieval failed:', error);
+                profileDetails.innerHTML = 'Error retrieving profile';
+            }
+        };
+    </script>
+</body>
+</html>
